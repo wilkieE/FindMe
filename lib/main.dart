@@ -1,38 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      home: Scaffold(
+        body: Center(
+          child: FutureBuilder(
+            future: _determinePosition(context),
+            builder: (context, AsyncSnapshot<Position> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else if (snapshot.data == null) {
+                return Container(); // Or any other widget you want to show when location services are disabled
+              } else {
+                return Text('Position: ${snapshot.data}');
+              }
+            },
+          ),
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
+  }
+
+  Future<Position> _determinePosition(BuildContext context) async {
+    _checkLocationService(context);
+    return _getPosition();
+  }
+
+  void _checkLocationService(BuildContext context) {
+    Geolocator.isLocationServiceEnabled().then((serviceEnabled) {
+      if (!serviceEnabled) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Location Services Disabled'),
+              content: Text('Please enable location services and try again.'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Ok'),
+                  onPressed: () {
+                    Navigator.of(context, rootNavigator: true).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+  }
+
+  Future<Position> _getPosition() async {
+    LocationPermission permission;
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
   }
 }
 
