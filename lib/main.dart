@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MaterialApp(
+    home: WelcomeScreen(),
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -15,6 +18,7 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   GoogleMapController? mapController;
+  Set<Marker> markers = {}; // Define a set of markers
 
   @override
   Widget build(BuildContext context) {
@@ -23,20 +27,36 @@ class MyAppState extends State<MyApp> {
         body: Center(
           child: FutureBuilder(
             future: _determinePosition(context),
-            builder: (context, AsyncSnapshot<LatLng> snapshot) {
+            builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator();
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
-              } else if (snapshot.data == null) {
+              } else if (snapshot.data == null ||
+                  snapshot.data!['position'] == null) {
                 return Container(); // Or any other widget you want to show when location services are disabled
               } else {
-                return GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: snapshot.data!,
-                    zoom: 11.0,
-                  ),
+                // Add a marker at the user's location
+                markers.add(Marker(
+                  markerId: const MarkerId('user_location'),
+                  position: snapshot.data!['position'],
+                ));
+
+                return Column(
+                  children: <Widget>[
+                    Text('Address: ${snapshot.data!['address']}'),
+                    Expanded(
+                      child: GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        initialCameraPosition: CameraPosition(
+                          target: snapshot.data!['position'],
+                          zoom: 11.0,
+                        ),
+                        markers:
+                            markers, // Pass the set of markers to the GoogleMap widget
+                      ),
+                    ),
+                  ],
                 );
               }
             },
@@ -50,10 +70,27 @@ class MyAppState extends State<MyApp> {
     mapController = controller;
   }
 
-  Future<LatLng> _determinePosition(BuildContext context) async {
+  Future<Map<String, dynamic>> _determinePosition(BuildContext context) async {
     _checkLocationService(context);
     final Position position = await _getPosition();
-    return LatLng(position.latitude, position.longitude);
+
+    // Get the placemark using the geocoding package
+    final List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+
+    String address = 'No address found';
+
+    // Ensure that an address was found
+    if (placemarks.isNotEmpty) {
+      final Placemark placemark = placemarks.first;
+      address =
+          '${placemark.street}, ${placemark.locality}, ${placemark.postalCode}, ${placemark.country}';
+    }
+
+    return {
+      'position': LatLng(position.latitude, position.longitude),
+      'address': address,
+    };
   }
 
   void _checkLocationService(BuildContext context) {
@@ -101,6 +138,44 @@ class MyAppState extends State<MyApp> {
   }
 }
 
+class WelcomeScreen extends StatelessWidget {
+  // Add a key parameter to the constructor and pass it to the super class
+  const WelcomeScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Welcome'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'Welcome to our app, click the button below to view your location',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20.0),
+            ),
+            ElevatedButton(
+              child: const Text('View Location'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyApp()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+//
+//
+//
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
