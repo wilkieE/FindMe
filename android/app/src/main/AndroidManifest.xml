@@ -5,6 +5,8 @@
         android:label="gps_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA1UbSjHzl6pZuFM_nednJKgH_R6CknBko"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  MyAppState createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  GoogleMapController? mapController;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,15 +23,21 @@ class MyApp extends StatelessWidget {
         body: Center(
           child: FutureBuilder(
             future: _determinePosition(context),
-            builder: (context, AsyncSnapshot<Position> snapshot) {
+            builder: (context, AsyncSnapshot<LatLng> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+                return const CircularProgressIndicator();
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else if (snapshot.data == null) {
                 return Container(); // Or any other widget you want to show when location services are disabled
               } else {
-                return Text('Position: ${snapshot.data}');
+                return GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: snapshot.data!,
+                    zoom: 11.0,
+                  ),
+                );
               }
             },
           ),
@@ -30,9 +46,14 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Future<Position> _determinePosition(BuildContext context) async {
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  Future<LatLng> _determinePosition(BuildContext context) async {
     _checkLocationService(context);
-    return _getPosition();
+    final Position position = await _getPosition();
+    return LatLng(position.latitude, position.longitude);
   }
 
   void _checkLocationService(BuildContext context) {
@@ -42,11 +63,12 @@ class MyApp extends StatelessWidget {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Location Services Disabled'),
-              content: Text('Please enable location services and try again.'),
+              title: const Text('Location Services Disabled'),
+              content:
+                  const Text('Please enable location services and try again.'),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Ok'),
+                  child: const Text('Ok'),
                   onPressed: () {
                     Navigator.of(context, rootNavigator: true).pop();
                   },
