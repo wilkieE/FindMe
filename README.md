@@ -1,9 +1,9 @@
 # FindMe
 
 <p float="left">
-  <img src="https://github.com/wilkieE/DEF-Electronics/assets/48595932/2ae88be4-4649-4295-a444-2d98ad652142" width="33%" /> 
-  <img src="https://github.com/wilkieE/DEF-Electronics/assets/48595932/93a1bc86-c017-46e9-aa77-acc7cc54cc03" width="33%" />
-  <img src="https://github.com/wilkieE/DEF-Electronics/assets/48595932/fa2d25a4-637e-4d52-85bc-63d5493e0f88" width="33%" />
+  <img src="https://github.com/wilkieE/DEF-Electronics/assets/48595932/2ae88be4-4649-4295-a444-2d98ad652142" width="32%" /> 
+  <img src="https://github.com/wilkieE/DEF-Electronics/assets/48595932/93a1bc86-c017-46e9-aa77-acc7cc54cc03" width="32%" />
+  <img src="https://github.com/wilkieE/DEF-Electronics/assets/48595932/fa2d25a4-637e-4d52-85bc-63d5493e0f88" width="32%" />
 </p>
 
 ## Introduction
