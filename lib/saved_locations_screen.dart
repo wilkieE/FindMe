@@ -9,7 +9,7 @@ class SavedLocationsScreen extends StatefulWidget {
 }
 
 class _SavedLocationsScreenState extends State<SavedLocationsScreen> {
-  List<String>? locations;
+  List<String> locations = [];
 
   @override
   void initState() {
@@ -20,10 +20,11 @@ class _SavedLocationsScreenState extends State<SavedLocationsScreen> {
   Future<void> loadLocations() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      locations = prefs.getStringList('savedLocations');
+      var savedLocations = prefs.getStringList('savedLocations');
+      if (savedLocations != null) {
+        locations = savedLocations;
+      }
     });
-    print("hello");
-    print(locations);
   }
 
   @override
@@ -41,16 +42,18 @@ class _SavedLocationsScreenState extends State<SavedLocationsScreen> {
       ),
       body: locations == null
           ? const Center(child: CircularProgressIndicator())
-          : SizedBox(
-              height: MediaQuery.of(context).size.height * 0.8,
-              width: MediaQuery.of(context).size.width,
-              child: ListView.builder(
-                itemCount: locations!.length,
-                itemBuilder: (context, index) {
-                  return LocationTile(location: locations![index]);
-                },
-              ),
-            ),
+          : locations.isEmpty
+              ? const Center(child: Text('No saved locations'))
+              : SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  width: MediaQuery.of(context).size.width,
+                  child: ListView.builder(
+                    itemCount: locations.length,
+                    itemBuilder: (context, index) {
+                      return LocationTile(location: locations[index]);
+                    },
+                  ),
+                ),
     );
   }
 }
