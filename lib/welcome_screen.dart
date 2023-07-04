@@ -23,7 +23,7 @@ class WelcomeScreen extends StatelessWidget {
                 child: Text(
                   'Welcome to FindMe',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 30.0, fontStyle: FontStyle.italic),
+                  style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
                 ),
               ),
               Padding(
@@ -34,7 +34,7 @@ class WelcomeScreen extends StatelessWidget {
                     color: Colors.white,
                     size: 24.0,
                   ),
-                  label: const Text('View Location'),
+                  label: const Text('View Current Location'),
                   onPressed: () {
                     Navigator.push(
                       context,

@@ -47,9 +47,11 @@ class LocationScreenState extends State<LocationScreen> {
 
                           final positionData = await determinePosition(context);
                           final position = positionData['position'];
+                          final address = positionData['address'];
+                          final timestamp = DateTime.now().toString();
 
                           savedLocations.add(
-                              '${position.latitude},${position.longitude}');
+                              '${position.latitude},${position.longitude},$address,$timestamp');
                           await prefs.setStringList(
                               'savedLocations', savedLocations);
                         },
