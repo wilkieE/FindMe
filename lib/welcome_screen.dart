@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'location_screen.dart';
+import 'saved_locations_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   // Add a key parameter to the constructor and pass it to the super class
@@ -29,6 +30,16 @@ class WelcomeScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => const LocationScreen()),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: const Text('View Saved Locations'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SavedLocationsScreen()),
                   );
                 },
               ),

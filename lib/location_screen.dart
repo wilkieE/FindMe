@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({Key? key}) : super(key: key);
@@ -40,6 +41,23 @@ class LocationScreenState extends State<LocationScreen> {
                 return Column(
                   children: <Widget>[
                     Text('Address: ${snapshot.data!['address']}'),
+                    ElevatedButton(
+                      child: const Text('Save Location'),
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        final savedLocations =
+                            prefs.getStringList('savedLocations') ?? [];
+
+                        // Get the current position
+                        final positionData = await _determinePosition(context);
+                        final position = positionData['position'];
+
+                        savedLocations
+                            .add('${position.latitude},${position.longitude}');
+                        await prefs.setStringList(
+                            'savedLocations', savedLocations);
+                      },
+                    ),
                     Expanded(
                       child: GoogleMap(
                         onMapCreated: _onMapCreated,
