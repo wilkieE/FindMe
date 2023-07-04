@@ -16,32 +16,53 @@ class WelcomeScreen extends StatelessWidget {
         // Wrap the body in a SafeArea widget
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              const Text(
-                'Welcome to our app, click the button below to view your location',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20.0),
+              const Padding(
+                padding: EdgeInsets.only(top: 250.0),
+                child: Text(
+                  'Welcome to FindMe',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 30.0, fontStyle: FontStyle.italic),
+                ),
               ),
-              ElevatedButton(
-                child: const Text('View Location'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LocationScreen()),
-                  );
-                },
+              Padding(
+                padding: const EdgeInsets.only(top: 50.0),
+                child: ElevatedButton.icon(
+                  icon: const Icon(
+                    Icons.location_on,
+                    color: Colors.white,
+                    size: 24.0,
+                  ),
+                  label: const Text('View Location'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LocationScreen(),
+                      ),
+                    );
+                  },
+                ),
               ),
-              ElevatedButton(
-                child: const Text('View Saved Locations'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SavedLocationsScreen()),
-                  );
-                },
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton.icon(
+                  icon: const Icon(
+                    Icons.bookmark,
+                    color: Colors.white,
+                    size: 24.0,
+                  ),
+                  label: const Text('View Saved Locations'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SavedLocationsScreen(),
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
